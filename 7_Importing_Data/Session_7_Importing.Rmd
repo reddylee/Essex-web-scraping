@@ -24,12 +24,16 @@ we talk about how to work with data in practice.
 Please note your answers to these questions (5 Minutes)
 
 *  What defines tabular/rectangular data?
+A: variables and observations.
   
 *  What are advantages of treelike data in comparison?
+A: no specific length limit or matching requirement.
   
 *  What are possible problems when turning trees into tables?
+A: different lengths.
   
 *  Indicate the problems you had yesterday when putting data into form.
+A: ?
   
 
 First, we will learn how to implement transformations of data, moving it across levels of analysis and shapes. 
@@ -94,7 +98,7 @@ Extra bad example:
 ```{r}
 
 #setwd('C:\Users\admin\Documents\Lehre\Lehre FSS 19\Data')
-
+getwd()
 ``` 
 
 However. I suggest you do not rely on this. Setting working directories is considered bad practice, as this is something people always have to change when moving a project around. It is highly suggested you use projects or Mardown files. 
@@ -150,7 +154,7 @@ dir.create("files")
 dir.create("files/more_files")
 
 list.files("./files")
-
+getwd()
 ```
 
 ## How to name files 
@@ -207,7 +211,7 @@ dir.create("myproject/scripts") # if you like to split your analysis into indivi
 }
 ```
 
-good example of a scripts folder:
+good example of a scripts files:
 
 01_data_collection.R
 02_data_processing.R
@@ -231,6 +235,26 @@ source("myproject/scripts/01_data_collection.R")
 
 Create a directory for your research project. Use comments and mock code inside these scripts to describe what each script is doing!
 
+```{r}
+if (TRUE) {
+  dir.create("project")
+  dir.create("./project/data") # store data collected and created
+  dir.create("./project/papers") # store literature papers
+  dir.create("./project/img") # store images collected and created
+
+  dir.create("./project/script") # store scripts
+  dir.create("./project/doc") # store documents created
+  
+  dir.create("./project/other") # store whatever you don't know where to store
+
+}
+
+writeLines(con = "project/script/01_data_collection.R", text = "print('# Data collection')")
+```
+
+```{r}
+source("project/script/01_data_collection.R")
+```
 
 
 
@@ -245,8 +269,7 @@ Second, while we can import all kinds of data, there are two places where to loo
 
 
 As you can see in the help file, the function has a number of arguments, most importantly FILE which tells the computer what to open. 
-read.csv is a special case of read.table which has a lot decided before, like what kind of file it is supposed to open. The default is the
-Comma-separated values file, the mighty CSV.
+read.csv is a special case of read.table which has a lot decided before, like what kind of file it is supposed to open. The default is the Comma-separated values file, the mighty CSV.
 
 It is by far the most common way of storing data. This is what people mostly refer to as "excel-file", which is just a csv that is rendered unreadable for anyone unwilling to pay for it. Let's try it out. 
 
@@ -302,9 +325,9 @@ ASCII was designed for english-speakers and basically only contains the most bas
 
 A very complex coding scheme such as UTF-32, which can contain 2^32 different characters, will be 4x as memory intensive as UTF-8, which can only store 2^8 values. 
 
-This leads to a trade-off: we create data space to theoretically store 2^32 characters, but only need 2^8+8 that are specific for the language. This would be a waste of ressources. Accordingly, most institutions use 8-bit systems appropriate for their language and those very close to them. This creates a wildfire of encoding schemes. 
+This leads to a trade-off: we create data space to theoretically store 2^32 characters, but only need 2^8+8 that are specific for the language. This would be a waste of resources. Accordingly, most institutions use 8-bit systems appropriate for their language and those very close to them. This creates a wildfire of encoding schemes. 
 
-RStudio will automatically represent text following your OS configuration. For sensible systems (MacOS, Linux) this is always UTF-8. In window, this will depend on your own country version. 
+RStudio will automatically represent text following your OS configuration. For sensible systems (MacOS, Linux) this is always UTF-8. In Windows, this will depend on your own country version. 
 
 To understand how your computer deals with this, we need to know about how encodings are actually used in R. 
 
@@ -318,6 +341,7 @@ When you import data into R, you can choose the Encoding. It also has a default 
 
 ```{r}
 b0<-readLines("./bad_data/utf8.csv")
+b0
 ```
 
 ```{r}
@@ -350,6 +374,7 @@ So how do we find out encoding is used?
 
 ```{r}
 readr::guess_encoding("./bad_data/test.csv")
+readr::guess_encoding("./bad_data/utf8.csv")
 
 ```
 ```{r}
@@ -385,6 +410,9 @@ File formats are not only differing on the file level, but also WHAT is encoded.
 ```{r}
 
 bt<-read.csv("./bad_data/test.csv",sep=";",dec=",",encoding="latin1")
+
+bt1<-write.csv("./bad_data/test.csv",sep=":::",dec=",",encoding="latin1")
+
 ```
 
 
@@ -408,13 +436,14 @@ Here, this works fine, but what if you use other data formats?
 
 ```{r}
 
-ger_birthdate<-c("01.01.2010","15.02.2015","01.07.1995","01.11.2003")
-
+get_birthdate<-c("01.01.2010","15.02.2015","01.07.1995","01.11.2003")
+birthdate<-dmy("01.01.2010","15.02.2015","01.07.1995","01.11.2003")
 #df$ger_birthdate<-as.Date(df$ger_birthdate)
 
-ger_birthdate<-as.Date(ger_birthdate,format = "%d.%m.%Y") # day, month, year 
+get_birthdate<-as.Date(get_birthdate,format = "%d.%m.%Y") # day, month, year 
 
-ger_birthdate
+birthdate
+get_birthdate
 
 ```
 
@@ -454,7 +483,8 @@ January
 ```{r}
 x <- "2023-08-01 12:00:00"
 x<-as.POSIXct(x,tz = "GMT")
-
+ymd("2023-08-01")-ymd("2021-10-2")
+ymd(20230801)-ymd(20211002)
 ```
 
 ```{r}
@@ -508,8 +538,11 @@ As we can see, there are 2 Marius's!
 ```{r}
 ll$data[[1]]$name
 
+
 ll$data[[2]]$name
 
+ll$data[[1]]$authorId
+ll$data[[2]]$authorId
 
 ```
 You can see the first merging problem that will haunt us tomorrow :)
@@ -646,7 +679,7 @@ pol3<-do.call(rbind,sc2)
 
 ```
 
-The redundancies in this dataset are tremendous: only about 5%of the author string data is useful. 
+The redundancies in this dataset are tremendous: only about 5% of the author string data is useful. 
 
 
 ```{r}
@@ -699,4 +732,13 @@ json <- request("https://www.parlament.gv.at/Filter/api/json/post") %>%
   resp_body_json()
 ```
 
+
+```{r}
+df <- json [["rows"]]
+
+mp1 <- df[[1]]
+
+
+df[[234]][[3]]
+```
 
