@@ -45,13 +45,11 @@ Second, we will learn how to import data into R. I know you already know how to 
 
 This session is basically about getting data into a form that we can work with it. 
 
-
 Now we see that R can be used to create and manipulate objects which contain values. In the end, all data operations can be reduced to this. But to do statstics, we will want to read in real data.
 
-
 # FILES
-Data can be read in from two prototypical sources:
 
+Data can be read in from two prototypical sources:
 
 * Files 
 
@@ -144,6 +142,7 @@ gives you all the files of the Course. We can check what is in the data file fro
 ```{r}
 
 list.files("../data/")
+
 ```
 
 And of course we change the FS also.
@@ -158,7 +157,6 @@ getwd()
 ```
 
 ## How to name files 
-
 
 Machine-readable file names: 
 
@@ -175,7 +173,6 @@ Please use ASCII. I fried my OS last week because university thought it would be
 NO UPPER CASE! 
 
 Linux (and accordingly, servers), are case senstive. 
-
 
 
 File names that sort well 
@@ -221,7 +218,7 @@ good example of a scripts files:
 05_plotting.R
 
 ```{r}
-writeLines(con = "myproject/scripts/01_data_collection.R",text = "print('Hello Data')")
+writeLines(con = "myproject/scripts/01_data_collection.R",text = "# print('Hello Data')")
 
 ```
 
@@ -229,6 +226,21 @@ Using the source command then lets you run scripts from other files (in Full).
 
 ```{r}
 source("myproject/scripts/01_data_collection.R")
+```
+
+
+```{r}
+root<-"myproject/scripts"
+myfiles<-c("01_data_collection.R",
+"02_data_processing.R",
+"03a_joining.R",
+"03b_aggregation.R",
+"04_analysis.R",
+"05_plotting.R")
+
+for(i in 1:length(myfiles)){writeLines(paste0("./",root,"/",myfiles[i]),"A Script")}
+
+
 ```
 
 # EXERCISE 
@@ -309,8 +321,10 @@ This comes mainly in form of three problems: file encodings, separators and date
 
 ```{r}
 Sys.getlocale()
-```
 
+Sys.setlocale("LC_TIME=France_french.utf8")
+
+```
 
 
 ### The Terror of the ENCODINGS
@@ -415,6 +429,11 @@ bt1<-write.csv("./bad_data/test.csv",sep=":::",dec=",",encoding="latin1")
 
 ```
 
+```{r}
+
+bt<-write.csv("./bad_data/test.csv",sep=":::",dec=",",encoding="latin1")
+```
+
 
 ## Dates
 
@@ -436,8 +455,15 @@ Here, this works fine, but what if you use other data formats?
 
 ```{r}
 
+<<<<<<< HEAD
 get_birthdate<-c("01.01.2010","15.02.2015","01.07.1995","01.11.2003")
 birthdate<-dmy("01.01.2010","15.02.2015","01.07.1995","01.11.2003")
+=======
+ger_birthdate<-c("01.01.2010","15.02.2015","01.07.1995","01.11.2003")
+
+ger_birthdate<-as.Date(ger_birthdate)
+
+>>>>>>> main
 #df$ger_birthdate<-as.Date(df$ger_birthdate)
 
 get_birthdate<-as.Date(get_birthdate,format = "%d.%m.%Y") # day, month, year 
@@ -449,12 +475,20 @@ get_birthdate
 
 POSIXct: sequence of integers
 POSIXlt:list  
+```{r}
+as.POSIXlt(ger_birthdate)
+
+```
 
 
 ```{r}
+
+
 Sys.timezone(location = TRUE) # this is a setting from the OS.
+
 Sys.time()
 ```
+
 
 
 ```{r}
@@ -466,9 +500,8 @@ format(today, format="%B %d %Y")
 
 
 %d	day as a number (0-31)	01-31
-%a
-%A	abbreviated weekday
-unabbreviated weekday	Mon
+%a abbreviated weekday
+%A	unabbreviated weekday	Mon
 Monday
 %m	month (00-12)	00-12
 %b
@@ -543,6 +576,14 @@ ll$data[[2]]$name
 
 ll$data[[1]]$authorId
 ll$data[[2]]$authorId
+<<<<<<< HEAD
+=======
+
+ll$data[[3]]$authorId
+ll$data[[3]]$name
+
+
+>>>>>>> main
 
 ```
 You can see the first merging problem that will haunt us tomorrow :)
@@ -623,6 +664,8 @@ As mentioned before, we want to do a little course project: collecting data on c
 Let's import a seed dataset. 
 ```{r}
 r1<-readRDS("../seeds/ecpr_2023_data.rds")
+
+nrow(r1)
 ```
 
 
@@ -734,6 +777,7 @@ json <- request("https://www.parlament.gv.at/Filter/api/json/post") %>%
 
 
 ```{r}
+<<<<<<< HEAD
 df <- json [["rows"]]
 
 mp1 <- df[[1]]
@@ -742,3 +786,22 @@ mp1 <- df[[1]]
 df[[234]][[3]]
 ```
 
+=======
+df<-json[["rows"]]
+
+
+mat<-matrix(NA,nrow=length(df),ncol=9)
+for(i in 1:length(df)){
+  
+  mat[i,]<-unlist(df[[i]])
+  
+  
+}
+
+df1<-as.data.frame(mat)
+
+
+```
+
+
+>>>>>>> main
